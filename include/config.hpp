@@ -12,9 +12,11 @@ constexpr uint8_t SENSOR_PINS[SENSOR_COUNT] = {
 
 constexpr int PIN_UART_RX = 17;
 constexpr int PIN_UART_TX = 18;
-constexpr uint32_t UART_BAUD = 460800;
+constexpr uint32_t UART_BAUD = 115200;
 
 // UART0 test output. Each line contains the latest values for sensors 0-17.
+// Set false when the Teensy is connected because it shares this UART.
+constexpr bool DEBUG_OUTPUT_ENABLED = true;
 constexpr uint32_t TEST_SERIAL_BAUD = 115200;
 constexpr uint16_t TEST_PRINT_RATE_HZ = 20;
 
@@ -36,4 +38,3 @@ constexpr uint16_t DEFAULT_MEASUREMENT_RATE_HZ = 250;
 constexpr uint16_t DEFAULT_RAW_RATE_HZ = 0;
 constexpr uint16_t STATUS_RATE_HZ = 1;
 }
-
