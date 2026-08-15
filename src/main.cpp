@@ -45,7 +45,7 @@ ir::Vector2 calculateIrDirection(
 
     selected[strongestSensor] = true;
     const float bearing =
-        static_cast<float>(strongestSensor) * SENSOR_ANGLE_DEGREES;
+        static_cast<float>(strongestSensor + 1) * SENSOR_ANGLE_DEGREES;
 
     direction += ir::Vector2::fromBearingDegrees(bearing, strongestWeight);
   }
@@ -57,10 +57,13 @@ void printDebugValues(const uint16_t (&values)[config::SENSOR_COUNT],
                       const ir::Vector2 &direction, float bearingDegrees,
                       float strength) {
   Serial0.print("IR");
-  for (uint8_t sensor = 0; sensor < config::SENSOR_COUNT; ++sensor) {
-    Serial0.print(',');
-    Serial0.print(values[sensor]);
-  }
+  // for (uint8_t sensor = 0; sensor < config::SENSOR_COUNT; ++sensor) {
+  //   if (sensor == 17) {
+  //     Serial0.print(',');
+  //     Serial0.print(values[sensor]);
+  //   }
+  // }
+  // Serial0.println();
 
   Serial0.print(',');
   Serial0.print(direction.x(), 3);
@@ -111,8 +114,7 @@ void setup() {
   const uint32_t uartBaud = config::DEBUG_OUTPUT_ENABLED
                                 ? config::TEST_SERIAL_BAUD
                                 : config::UART_BAUD;
-  Serial0.begin(uartBaud, SERIAL_8N1, config::PIN_UART_RX,
-                config::PIN_UART_TX);
+  Serial0.begin(uartBaud, SERIAL_8N1);
 
   if (config::DEBUG_OUTPUT_ENABLED) {
     Serial0.print("type");

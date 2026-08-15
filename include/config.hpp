@@ -10,13 +10,11 @@ constexpr uint8_t SENSOR_PINS[SENSOR_COUNT] = {
     11, 12, 13, 14, 15, 16, 17, 18
 };
 
-constexpr int PIN_UART_RX = 17;
-constexpr int PIN_UART_TX = 18;
 constexpr uint32_t UART_BAUD = 115200;
 
 // UART0 test output. Each line contains the latest values for sensors 0-17.
-// Set false when the Teensy is connected because it shares this UART.
-constexpr bool DEBUG_OUTPUT_ENABLED = true;
+// This intentionally shares UART0 with the Teensy connection.
+constexpr bool DEBUG_OUTPUT_ENABLED = false;
 constexpr uint32_t TEST_SERIAL_BAUD = 115200;
 constexpr uint16_t TEST_PRINT_RATE_HZ = 20;
 
@@ -26,15 +24,13 @@ constexpr uint8_t SENSOR_INPUT_MODE = INPUT_PULLUP;
 
 // Per-channel gain in Q8 format: 256 = 1.000. Adjust after calibration.
 constexpr uint16_t SENSOR_CALIBRATION[SENSOR_COUNT] = {
-    256, 256, 256, 256, 256, 256, 256, 256, 256,
-    256, 256, 256, 256, 256, 256, 256, 256, 256,
+    171, 174, 233, 165, 165, 223, 163, 155, 219,
+    165, 165, 244, 155, 154, 256, 160, 160, 256,
 };
 
 constexpr uint8_t SIGNALS_TO_USE = 5;
 
 constexpr uint16_t SAMPLE_PERIOD_US = 50;
-constexpr uint16_t MEASUREMENT_PERIOD_US = 4000;
+constexpr uint16_t MEASUREMENT_PERIOD_US = 12000;
 constexpr uint16_t DEFAULT_MEASUREMENT_RATE_HZ = 250;
-constexpr uint16_t DEFAULT_RAW_RATE_HZ = 0;
-constexpr uint16_t STATUS_RATE_HZ = 1;
 }
