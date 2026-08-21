@@ -11,9 +11,7 @@ enum class PacketType : uint8_t {
   BLUETOOTH_TO_TEENSY = 0x02,
 };
 
-// A frame is:
 //   A5 5A | type | length | sequence | payload | CRC16 (little-endian)
-// CRC-16/CCITT-FALSE covers every field after the marker.
 bool sendPacket(PacketType type, const uint8_t *payload,
                 uint8_t payloadLength);
 

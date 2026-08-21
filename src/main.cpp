@@ -113,6 +113,14 @@ float calculateSignalStrength(
       (strength / static_cast<float>(config::SENSOR_COUNT)) *
       100.0F;
 
+  constexpr float SIGNAL_MIN = 20.0F;
+  constexpr float SIGNAL_MAX = 50.0F;
+
+  strength =
+      ((strength - SIGNAL_MIN) /
+       (SIGNAL_MAX - SIGNAL_MIN)) *
+      100.0F;
+
   return constrain(strength, 0.0F, 100.0F);
 }
 
@@ -144,46 +152,9 @@ void updateFilteredSignalStrength(float newStrength) {
       (newStrength - filteredIrSignalStrength);
 }
 
-void printCalibrationDebug() {
-
-  Serial0.print("IR");
-
-  for (uint8_t sensor = 0;
-       sensor < config::SENSOR_COUNT;
-       ++sensor) {
-
-    Serial0.print(',');
-    Serial0.print(sensor + 1);
-
-    Serial0.print(',');
-    Serial0.print(sensorCounts[sensor]);
-
-    Serial0.print(',');
-    Serial0.print(sensorStrengths[sensor] * 100.0F, 2);
-
-    const float calibratedStrength =
-        sensorStrengths[sensor] *
-        static_cast<float>(
-            config::SENSOR_CALIBRATION[sensor]) /
-        256.0F;
-
-    Serial0.print(',');
-    Serial0.print(calibratedStrength, 3);
-  }
-
-  Serial0.print(",bearing,");
-  Serial0.print(irBearingDegrees, 2);
-
-  Serial0.print(",signal,");
-  Serial0.print(filteredIrSignalStrength, 2);
-
-  Serial0.print(",confidence,");
-  Serial0.println(irDirectionConfidence, 3);
-}
-
 void printCalibrationHeader() {
 
-  Serial0.print("type");
+  Serial0.print("samples");
 
   for (uint8_t sensor = 0;
        sensor < config::SENSOR_COUNT;
@@ -192,15 +163,50 @@ void printCalibrationHeader() {
     Serial0.print(",sensor");
     Serial0.print(sensor + 1);
 
-    Serial0.print(",count");
-
-    Serial0.print(",percentage");
+    Serial0.print(",percent");
 
     Serial0.print(",calibrated");
   }
 
-  Serial0.println(
-      ",bearing,signal,confidence");
+  Serial0.println();
+}
+
+void printCalibrationValues() {
+
+  Serial0.print(sampleCount);
+
+  for (uint8_t sensor = 0;
+       sensor < config::SENSOR_COUNT;
+       ++sensor) {
+
+    const float calibratedStrength =
+        sensorStrengths[sensor] *
+        static_cast<float>(config::SENSOR_CALIBRATION[sensor]) /
+        256.0F;
+
+    Serial0.print(',');
+    Serial0.print(sensorCounts[sensor]);
+
+    Serial0.print(',');
+    Serial0.print(sensorStrengths[sensor] * 100.0F, 2);
+
+    Serial0.print(',');
+    Serial0.print(calibratedStrength, 3);
+  }
+
+  Serial0.println();
+}
+
+void printDebugValues() {
+
+  Serial0.print("bearing=");
+  Serial0.print(irBearingDegrees, 2);
+
+  Serial0.print(",strength=");
+  Serial0.print(filteredIrSignalStrength, 2);
+
+  Serial0.print(",confidence=");
+  Serial0.println(irDirectionConfidence, 3);
 }
 
 void sampleSensors() {
@@ -247,9 +253,16 @@ void processMeasurement() {
   updateFilteredSignalStrength(
       irSignalStrength);
 
-  if (config::DEBUG_OUTPUT_ENABLED) {
-    printCalibrationDebug();
+  if (config::CALIBRATION_MODE) {
+
+    printCalibrationValues();
+
+  } else if (config::DEBUG_OUTPUT_ENABLED) {
+
+    printDebugValues();
+
   } else {
+
     uart_communication::sendIrMeasurement(
         irBearingDegrees,
         filteredIrSignalStrength);
@@ -288,7 +301,7 @@ void readSensorValues() {
 void setup() {
 
   const uint32_t uartBaud =
-      config::DEBUG_OUTPUT_ENABLED
+      config::CALIBRATION_MODE || config::DEBUG_OUTPUT_ENABLED
           ? config::TEST_SERIAL_BAUD
           : config::UART_BAUD;
 
@@ -305,7 +318,7 @@ void setup() {
         config::SENSOR_INPUT_MODE);
   }
 
-  if (config::DEBUG_OUTPUT_ENABLED) {
+  if (config::CALIBRATION_MODE) {
     printCalibrationHeader();
   }
 
