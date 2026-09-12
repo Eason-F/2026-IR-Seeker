@@ -13,7 +13,7 @@ float sensorStrengths[config::SENSOR_COUNT] = {};
 
 uint16_t sampleCount = 0;
 
-ir::Vector2 irDirection;
+vec2::Vector2 irDirection;
 float irBearingDegrees = 0.0F;
 float irDirectionConfidence = 0.0F;
 
@@ -40,10 +40,10 @@ float normalizeBearingDegrees(float bearingDegrees) {
 
 }  // namespace
 
-ir::Vector2 calculateIrDirection(
+vec2::Vector2 calculateIrDirection(
     const float (&strengths)[config::SENSOR_COUNT]) {
 
-  ir::Vector2 direction;
+  vec2::Vector2 direction;
   bool selected[config::SENSOR_COUNT] = {};
 
   constexpr float SENSOR_ANGLE_DEGREES =
@@ -87,7 +87,7 @@ ir::Vector2 calculateIrDirection(
     }
 
     direction +=
-        ir::Vector2::fromBearingDegrees(
+        vec2::Vector2::fromBearingDegrees(
             bearing,
             strongestWeight);
   }

@@ -2,9 +2,8 @@
 
 #include <cmath>
 
-namespace ir {
+namespace vec2 {
 
-// A 2D vector in robot coordinates:
 //   +x is right, +y is forward, and positive rotation is clockwise.
 class Vector2 {
  public:
