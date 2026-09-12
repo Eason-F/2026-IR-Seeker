@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "config.hpp"
+#include "esp_communication.hpp"
 #include "uart_communication.hpp"
 #include "vector.hpp"
 
@@ -309,6 +310,10 @@ void setup() {
       uartBaud,
       SERIAL_8N1);
 
+  if (!config::CALIBRATION_MODE && !config::DEBUG_OUTPUT_ENABLED) {
+    esp_communication::begin();
+  }
+
   for (uint8_t sensor = 0;
        sensor < config::SENSOR_COUNT;
        ++sensor) {
@@ -327,4 +332,8 @@ void setup() {
 
 void loop() {
   readSensorValues();
+
+  if (!config::CALIBRATION_MODE && !config::DEBUG_OUTPUT_ENABLED) {
+    esp_communication::update();
+  }
 }

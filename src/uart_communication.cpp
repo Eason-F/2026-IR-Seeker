@@ -23,6 +23,10 @@ constexpr size_t MAX_FRAME_LENGTH =
 
 uint8_t txSequence = 0;
 
+uint8_t rxFrame[MAX_FRAME_LENGTH];
+size_t rxLength = 0;
+size_t expectedFrameLength = 0;
+
 uint16_t crc16Ccitt(const uint8_t *data, size_t length) {
   uint16_t crc = 0xFFFF;
   for (size_t index = 0; index < length; ++index) {
@@ -39,6 +43,11 @@ uint16_t crc16Ccitt(const uint8_t *data, size_t length) {
 void writeU16(uint8_t *destination, uint16_t value) {
   destination[0] = static_cast<uint8_t>(value);
   destination[1] = static_cast<uint8_t>(value >> 8);
+}
+
+uint16_t readU16(const uint8_t *source) {
+  return static_cast<uint16_t>(source[0]) |
+         (static_cast<uint16_t>(source[1]) << 8);
 }
 
 int16_t encodeBearing(float bearingDegrees) {
@@ -96,6 +105,46 @@ bool sendIrMeasurement(float bearingDegrees, float strength) {
 
 bool sendBluetoothToTeensy(const uint8_t *data, uint8_t length) {
   return sendPacket(PacketType::BLUETOOTH_TO_TEENSY, data, length);
+}
+
+void receivePackets(PacketHandler handler) {
+  while (Serial0.available() > 0) {
+    const uint8_t byte = static_cast<uint8_t>(Serial0.read());
+
+    if (rxLength == 0 && byte != MARKER_0) continue;
+    if (rxLength == 1 && byte != MARKER_1) {
+      rxLength = byte == MARKER_0 ? 1 : 0;
+      continue;
+    }
+
+    rxFrame[rxLength++] = byte;
+
+    if (rxLength == PAYLOAD_OFFSET) {
+      const uint8_t payloadLength = rxFrame[LENGTH_OFFSET];
+      if (payloadLength > MAX_PAYLOAD_LENGTH) {
+        rxLength = 0;
+        expectedFrameLength = 0;
+        continue;
+      }
+      expectedFrameLength = PAYLOAD_OFFSET + payloadLength + CRC_LENGTH;
+    }
+
+    if (expectedFrameLength != 0 && rxLength == expectedFrameLength) {
+      const uint8_t payloadLength = rxFrame[LENGTH_OFFSET];
+      const size_t crcPosition = PAYLOAD_OFFSET + payloadLength;
+      const uint16_t expectedCrc = readU16(rxFrame + crcPosition);
+      const uint16_t actualCrc =
+          crc16Ccitt(rxFrame + TYPE_OFFSET, 3 + payloadLength);
+
+      if (actualCrc == expectedCrc && handler != nullptr) {
+        handler(static_cast<PacketType>(rxFrame[TYPE_OFFSET]),
+                rxFrame + PAYLOAD_OFFSET, payloadLength);
+      }
+
+      rxLength = 0;
+      expectedFrameLength = 0;
+    }
+  }
 }
 
 }  // namespace uart_communication

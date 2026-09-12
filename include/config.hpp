@@ -16,6 +16,8 @@ constexpr bool CALIBRATION_MODE = false;
 constexpr bool DEBUG_OUTPUT_ENABLED = false;
 
 constexpr uint32_t UART_BAUD = 115200;
+constexpr uint8_t ESP_NOW_CHANNEL = 1;
+constexpr uint16_t ESP_NOW_RELAY_INTERVAL_MS = 25;
 constexpr uint32_t TEST_SERIAL_BAUD = 115200;
 constexpr uint16_t TEST_PRINT_RATE_HZ = 20;
 
