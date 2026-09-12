@@ -115,7 +115,7 @@ float calculateSignalStrength(
       100.0F;
 
   constexpr float SIGNAL_MIN = 0.0F;
-  constexpr float SIGNAL_MAX = 33.0F;
+  constexpr float SIGNAL_MAX = 40.0F;
 
   strength =
       ((strength - SIGNAL_MIN) /
