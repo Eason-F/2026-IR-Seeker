@@ -34,7 +34,7 @@ constexpr uint16_t SENSOR_CALIBRATION[SENSOR_COUNT] = {
 };
 #endif
 
-constexpr uint8_t SIGNALS_TO_USE = 5;
+constexpr uint8_t SIGNALS_TO_USE = 18;
 
 constexpr uint16_t SAMPLE_PERIOD_US = 50;
 
